@@ -1,0 +1,95 @@
+# 進階 05 · 惡性像正常：AML 的階層
+
+**難度**：★★★ ｜ **預估時間**：2 個工作天 ｜ **對應集數**：B15、B16、B19（AML 戰法）｜ **資料集**：GSE116256（本題獨用）
+
+## 背景與研究主題
+
+van Galen 等人（2019）用 Seq-Well 定序了 16 位 AML 病人（多個治療時點）與 5 位健康捐贈者的骨髓細胞。AML 是「惡性判定」最刁鑽的場景：惡性 blast 不是長成一團與正常細胞截然不同的怪東西，而是**模仿正常造血階層**——從 HSC-like 到單核球-like 都有，marker 幾乎全部與正常細胞重疊。這正是 B19 AML 戰法的核心：**用健康 donor 建立正常參照系，惡性是「偏離參照系」定義出來的**。但「偏離」本身怎麼量化，其實有好幾條路，答案未必一致——這是本題發表導向的切口。你的研究主題：
+
+1. 健康骨髓的造血階層長什麼樣？能不能建出可靠的「正常參照系」？
+2. 病人細胞中，哪些落在正常階層之內，哪些偏離了（疑似惡性 blast）？
+3. **「偏離」的三種量化（投影距離、分類器、CNV）彼此同意嗎？不同意的細胞是誰？** 各病人的 blast 組成能不能把病人分成幾型？
+
+## 資料集
+
+- **GSE116256**（Seq-Well，~38,410 cells；16 AML 病人（多時點）+ 5 健康）
+- 格式：**per-sample 的 `dem.txt`（count matrix）+ `anno.txt`（細胞 metadata）**，一個樣本兩個檔，GEO Supplementary files 逐一下載。
+- 本題**可先取子集**：5 位健康 + 4–6 位病人的 **diagnosis（Day 0）時點**。全量多時點不是本題目標，先把「正常 vs 偏離」做扎實。
+
+## 真實數據關卡
+
+真實資料在你跑第一行 Seurat 之前就開始出題。照做並記錄：
+
+1. **per-sample 批次讀入**：幾十個樣本、每樣本兩個檔——手動讀是自虐。`list.files()` 抓檔名、用命名規則配對 dem/anno，迴圈內 `read.delim` → 建物件 → 掛 anno → `merge()`。配對前先驗貨：dem 的欄名與 anno 的細胞名對得起來嗎？每個樣本的細胞數 dem 與 anno 一致嗎？細胞名加樣本前綴避免撞名。**樣本檔名裡的時點編碼（如 D0/D31）要解析成 metadata 欄**——這是你選 diagnosis 子集的依據，選了哪些樣本、為什麼，記錄。
+2. **anno.txt 裡的作者答案先蓋住**：anno 附有作者的細胞型別註解與惡性判定欄——**讀入時就把這些欄改名加 `author_` 前綴收起來，做完自己的判定前不准看**。這不是儀式：看過答案的註解不再是獨立判定，你之後的「對答案」就失去意義。哪些欄被你蓋住了，列在 decisions.md。
+3. **Seq-Well 淺深度**：Seq-Well 每細胞深度比 10x 淺，nFeature/nCount 分布整體偏低——QC 閾值照搬 10x 數字會砍掉大半好細胞；淺深度也讓 marker 偵測不穩（dropout 多），這會直接衝擊你在階段 B 的「偏離」判定與 CNV 訊號強度（AML 是液態腫瘤，CNV 本來就可能弱，B19 AML 戰法特別提醒過）。閾值看這份資料自己的分布訂，並在解讀時把深度限制寫進去。
+4. **決策日誌**：開一個 `decisions.md`，凡是「資料逼你做的決定」都記一筆：發現了什麼 → 選項 → 你選了什麼 → 理由。這份日誌是繳交物，也是之後論文 Methods 的草稿。
+
+## 任務
+
+### 階段 A：讀入合併與正常參照系（對應 B5–B10、B15）
+
+1. 迴圈讀入選定樣本，metadata 至少帶：樣本 ID、病人/健康、時點（作者判定欄蓋住）。QC 到 UMAP。
+2. **只用 5 位健康樣本**建正常造血參考：分群、用造血 marker（HSC/progenitor：CD34；GMP；單核球：CD14/LYZ；紅系：HBB/GATA1；B：CD79A；T/NK…）註解出造血階層。
+3. 對健康參考跑一條軌跡分析（B15：先想清楚起點是誰、憑什麼），建出「HSC → 成熟」分化軸。
+
+### 階段 B：三路量化「偏離」（對應 B16、B19 AML 戰法）
+
+4. **路一（投影距離）**：病人細胞投影到健康參考（`FindTransferAnchors` + `MapQuery`），每顆細胞得到最像的階層位置與 mapping/prediction 分數，分數低＝偏離。
+5. **路二（分類器）**：拿健康參考訓練一個簡單分類器（label transfer 本身、或 SingleR/自訓模型），對病人細胞輸出「最大類別機率」，機率低或跨類別模糊＝偏離。**路三（CNV）**：inferCNV 以病人自己樣本內的 T/NK 當 reference——惡性判定靠 CNV 不是 marker，但記得液態腫瘤 CNV 可能弱、Seq-Well 深度讓它更弱。
+6. 三路交叉：做三方一致性比較（upset 圖或混淆表）。三路都說惡性的細胞、只有一路說的細胞，各是誰？再與蓋住的 `author_` 欄對答案：不一致集中在哪些病人、哪個分化位置？誰比較可信、憑什麼？
+
+### 階段 C：偏離的量化本身就是題目（發表導向）
+
+7. 把各病人（diagnosis）的疑似惡性細胞放回分化軸，畫各病人 blast 沿「HSC-like → 分化」軸的密度分布（一張圖、病人並排）。哪些病人卡在早期、哪些偏成熟？
+8. 二選一深挖：**(a) 方法學路線**——把三路「偏離」判定的分歧系統化：分歧率與分化位置、細胞深度、病人的關係；哪一路在哪種情境下最不可靠？這是一個可以寫成方法比較的骨架。**(b) 生物學路線**——用每位病人的 blast 階層組成向量做病人層級聚類：diagnosis 時的 blast 組成能把病人分成幾型？分型與 anno/GEO 頁提供的病人臨床欄位（有什麼用什麼，以 GEO 頁為準）有沒有關聯？
+9. 穩健性：換投影方法或去掉一位健康 donor 重建參照系，你的偏離判定與病人分型還穩嗎？寫「發表路徑」評估（見下節）。
+
+## 繳交物
+
+1. 可重跑的 R 專案（renv + `set.seed(1234)`、相對路徑、含讀檔迴圈）＋ `decisions.md` 決策日誌。
+2. 圖：健康參考註解 UMAP＋分化軸、三路偏離判定的一致性圖、與作者判定的對答案圖、各病人 blast 沿分化軸密度圖、階段 C 深挖圖組（英文標籤）。
+3. 分析筆記：參數三件事＋各階段回答＋對答案結果。
+4. 發表路徑評估（300–500 字；涵蓋原「策略短文」對參照系設計強弱的論證）。
+
+## 發表路徑
+
+讀 `_從練習到投稿指南.md` 後回答：
+
+- **訊號分類與穩健性**：你選的路線（三路分歧的規律／病人分型）屬於指南第二節的哪一類？「以病人為單位」這關——分型結論是每位病人一個點，還是被某位細胞數暴多的病人撐起來？去 donor、換方法後還穩嗎？
+- **驗證設計**：健康參照系這半邊，現成的交叉檢查場是**基礎05 的 bmcite 骨髓 CITE-seq**——用它重建一次正常階層（還有 ADT 蛋白證據可幫你錨定註解），看你的參照系是不是 5 位 donor 的偶然。AML 那半邊的獨立驗證，需要另一個含健康對照的 AML 單細胞資料集——**自己上 GEO 查（關鍵字如「AML bone marrow scRNA-seq」，資料集規模與格式以 GEO 頁為準）**，把找到的候選與適用性評估寫進來，這個查找本身就是練習。
+- **novelty 定位**：「投影到正常參照系找 blast」是 van Galen 已發表的思路，後續也有多篇方法（PubMed 查「AML single-cell malignant classifier / reference projection」）。你的角度——三路量化的系統比較、或 blast 組成分型接臨床——查完文獻後還剩多少新？
+- **缺什麼＋目標期刊層級**：方法學路線缺「多資料集 benchmark」，補齊可往 Briefings in Bioinformatics 層級；生物學分型路線缺獨立 AML 隊列＋臨床結局，補齊才夠格談領域期刊，否則落點是 Scientific Reports 層級或先掛 bioRxiv。
+
+## 自我檢核點
+
+- [ ] 讀檔合併用迴圈完成，dem/anno 配對驗證過，子集選擇有理由且進了 decisions.md
+- [ ] 作者判定欄在自己判定完成前確實蓋住，蓋了哪些欄有記錄
+- [ ] 正常參照系只用健康樣本建，每群有 marker 證據，軌跡起點有理由
+- [ ] 「偏離」用了三路獨立量化並做一致性比較，不是只看一種訊號
+- [ ] QC 與解讀都考慮了 Seq-Well 淺深度（含它對 CNV 與 marker 偵測的影響）
+- [ ] 發表路徑評估指名了 bmcite 交叉檢查，且實際上 GEO 查過候選驗證資料集
+
+## 提示（卡關再看）
+
+<details><summary>提示 1：per-sample 檔案讀入</summary>
+每個樣本的 dem.txt 是 gene × cell 的 tab 分隔矩陣，anno.txt 每列一顆細胞。`list.files(pattern="dem")` 配 `sub()` 換出 anno 檔名；迴圈內 `read.delim` → `CreateSeuratObject` → anno 欄位（作者判定欄改名 `author_*`）塞進 `meta.data`，最後 `merge(x, y = list_of_objects)`。
+</details>
+
+<details><summary>提示 2：投影與偏離</summary>
+健康參考 `RunUMAP(..., return.model = TRUE)`，病人物件 `FindTransferAnchors` + `MapQuery`。「偏離」單一訊號都不夠：prediction score 低可能只是深度低——把 nFeature 對 score 畫散點檢查混淆，這正是三路交叉存在的理由。
+</details>
+
+<details><summary>提示 3：分化軸比較</summary>
+不必對病人細胞重跑軌跡——用健康參考學到的 pseudotime（或沿軸座標）給投影後的病人細胞賦值，`geom_density` + `facet_wrap(~patient)` 一張圖解決。
+</details>
+
+## 進階挑戰
+
+- 挑一位有多時點的病人，比較 diagnosis vs 治療後 blast 沿分化軸的移動——這就是 van Galen 論文的核心圖之一，也是你解析時點編碼的回報。
+- 把三路偏離判定包成一個函式庫（輸入：參考物件＋查詢物件；輸出：三路分數與共識判定），這是方法學路線通往真正投稿的第一塊磚。
+
+## 參考文獻
+
+- van Galen P, et al. Single-Cell RNA-Seq Reveals AML Hierarchies Relevant to Disease Progression and Immunity. *Cell* (2019). GEO: GSE116256.
+- Stuart T, Butler A, et al. Comprehensive Integration of Single-Cell Data. *Cell* (2019).（bmcite 交叉檢查場，見基礎05）
