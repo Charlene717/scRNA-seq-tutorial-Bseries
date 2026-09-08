@@ -14,9 +14,9 @@ library(Seurat)
 library(ggplot2)
 set.seed(1234)                       # 全系列固定 seed，結果可重現
 
-# 資料還沒下載的話，先跑 data/download_data.R（見 repo README）
+# 資料還沒下載的話，先跑 R/B00_setup.R（見 repo README）
 data_dir <- "data/pbmc3k/filtered_gene_bc_matrices/hg19/"
-stopifnot("找不到資料資料夾，請先執行 data/download_data.R" =
+stopifnot("找不到資料資料夾，請先執行 R/B00_setup.R" =
             dir.exists(data_dir))
 dir.create("output", showWarnings = FALSE)
 

@@ -3,7 +3,7 @@
 #
 # 對應影片：scRNA-seq 教學影片系列 · B 系列 · 第 1 集
 # 資料：PBMC 3k（10x 官方 filtered_gene_bc_matrices, hg19；
-#       先執行 data/download_data.R 下載並解壓）
+#       先執行 R/B00_setup.R 下載並解壓）
 # 環境：R >= 4.3、Seurat v5.x、tidyverse（只用到 ggplot2）、renv
 #
 # 使用方式：從專案根目錄 source() 或逐段執行（全程約 2–3 分鐘）。
@@ -39,9 +39,9 @@ for (d in c("data", "R", "output")) {
 }
 
 ## ---- 2. data-check -------------------------------------------------
-# 資料還沒下載的話，先跑 data/download_data.R（約 7.6 MB）。
+# 資料還沒下載的話，先跑 R/B00_setup.R（約 7.6 MB）。
 mtx.dir <- "data/pbmc3k/filtered_gene_bc_matrices/hg19"
-stopifnot("找不到 pbmc3k，請先執行 data/download_data.R" =
+stopifnot("找不到 pbmc3k，請先執行 R/B00_setup.R" =
             dir.exists(mtx.dir))
 list.files(mtx.dir)   # 應有 barcodes.tsv / genes.tsv / matrix.mtx
 
