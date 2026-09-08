@@ -1,6 +1,9 @@
-# ---- R 執行期產物（跑腳本會生成，不入庫）----
-data/pbmc*/
-data/*.tar.gz
+# ---- Word 版教材：與 md 放在一起方便維護，但不上傳 ----
+# 二進位檔會永久留在版本歷史裡；要給學生下載請用 GitHub Release 掛附件。
+*.docx
+
+# ---- R 執行期產物（B00_setup.R 會生成，不入庫）----
+data/
 output/
 GDCdata/
 *.rds

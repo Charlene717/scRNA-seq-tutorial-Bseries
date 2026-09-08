@@ -3,7 +3,7 @@
 > **🚧 這個倉庫正在建置中。** 投影片、隨集腳本、練習題庫與參考庫都已經齊備、可以直接使用；影片正在製作，上架後會把連結陸續補進下面的表格。
 > 內容也會隨著課程改版持續更新。有任何疑問、勘誤或建議，歡迎開 [Issue](../../issues) 告訴我。
 
-> 十九集課程、983 頁投影片、十九支隨集腳本、80 題實作練習、四座參考庫——從 FASTQ 與 Cell Ranger 一路做到富集、通訊、軌跡、惡性判定與反卷積，把一份 scRNA-seq 分析做到能寫進論文。
+> 十九集主線＋五集補充、1,207 頁投影片、二十支隨集腳本、80 題實作練習、四座參考庫——從 FASTQ 與 Cell Ranger 一路做到富集、通訊、軌跡、惡性判定與反卷積，把一份 scRNA-seq 分析做到能寫進論文。
 
 ![code: MIT](https://img.shields.io/badge/code-MIT-blue.svg)
 ![content: CC BY--NC 4.0](https://img.shields.io/badge/content-CC%20BY--NC%204.0-lightgrey.svg)
@@ -60,7 +60,21 @@
 | B19 | 複雜樣本的分析策略設計：不同腫瘤、不同戰法 | 51 | ~36 分 | 製作中 | [中文](slides/B19_複雜樣本策略設計_投影片_ZH.pdf)&nbsp;｜&nbsp;[EN](slides/B19_Complex_Sample_Strategy_Slides_EN.pdf) | [`B19`](R/B19_strategy.R) |
 | — | 總結卡與重點卡（十九集的一頁式整理） | 36 | — | — | [中文](slides/B系列_總結卡與重點卡_ZH.pdf)&nbsp;｜&nbsp;[EN](slides/SeriesB_Summary_Cards_EN.pdf) | — |
 
-投影片**中英雙語各一套**（PDF），十九集共 983 頁，另有 36 頁總結卡。全系列約 11.8 小時。
+### BS 補充篇（BS1–BS5）
+
+主線之外的五集，**不進 B1–B19 的編號**。前三集講「動手之前」的功課（找資料、選平台、選工具），後兩集是 [`references/`](references/) 四座參考庫的導覽版——同樣的內容，用講的比用查的快。每集約 35 分鐘，可以單看，不必照順序。
+
+| # | 標題 | 頁數 | 時長 | 影片 | 投影片 | 前置 |
+|---|---|---|---|---|---|---|
+| BS1 | 抓資料與格式解剖：公開資料實戰 | 47 | ~35 分 | 製作中 | [中文](slides/BS1_抓資料與格式解剖_投影片_ZH.pdf)&nbsp;｜&nbsp;[EN](slides/BS1_Public_Data_And_Formats_Slides_EN.pdf) | B1、B5 |
+| BS2 | 平台大比較：10x 之外的世界 | 43 | ~34 分 | 製作中 | [中文](slides/BS2_平台大比較_投影片_ZH.pdf)&nbsp;｜&nbsp;[EN](slides/BS2_Platform_Comparison_Slides_EN.pdf) | B2–B5 |
+| BS3 | 工具地圖：一千八百個工具怎麼選 | 44 | ~34 分 | 製作中 | [中文](slides/BS3_工具地圖與選工具_投影片_ZH.pdf)&nbsp;｜&nbsp;[EN](slides/BS3_Tool_Landscape_Slides_EN.pdf) | B18 |
+| BS4 | 細胞標注資源導覽：從 marker 到圖譜 | 48 | ~35 分 | 製作中 | [中文](slides/BS4_細胞標注資源導覽_投影片_ZH.pdf)&nbsp;｜&nbsp;[EN](slides/BS4_Annotation_Resources_Slides_EN.pdf) | B10、B16 |
+| BS5 | 富集分析資源導覽：從基因清單到生物學 | 42 | ~35 分 | 製作中 | [中文](slides/BS5_富集分析資源導覽_投影片_ZH.pdf)&nbsp;｜&nbsp;[EN](slides/BS5_Enrichment_Resources_Slides_EN.pdf) | B12、B13 |
+
+BS1 的重點是**格式解剖**：10x 三件套、Cell Ranger 的 `.h5`、h5ad↔Seurat 轉檔、dense txt/csv 的記憶體高峰、XLS 把基因名變成日期的慘案、註解列混進矩陣。BS2 把液滴式、微孔、平盤全長、條碼組合四類平台逐一側寫，並說明平台差異怎麼改變 QC 的判讀標準。BS3 教「選工具四步」：目錄找候選 → benchmark 找證據 → 官方教學確認 → 記版本。BS4、BS5 各自走完一次選庫／選方法的決策樹，並附實戰劇本。
+
+投影片**中英雙語各一套**（PDF），主線十九集共 983 頁、補充五集共 224 頁，另有 36 頁總結卡。全系列約 14.7 小時（主線 11.8＋補充 2.9）。
 
 > **建議觀看順序**：B17 → B19 → B18。B19 是策略課，放在反卷積之後、收官之前；B18 保持系列收尾。
 
@@ -73,6 +87,8 @@
 | 論文裡那些下游圖（通訊、軌跡、CNV、反卷積） | 加 B14–B18 | 加腳本 14–18 | 再 4–7 天 |
 | 自己跑上游、處理多樣本與多模態 | 加 B2–B4 | 加 `B02`–`B04` 指令稿 | 視資料與機器而定 |
 | 面對腫瘤等複雜樣本設計自己的策略 | 全系列 + B19 | 全部腳本 + [`exercises/`](exercises/) | 挑一條主線做完，數週 |
+| 動手之前先搞定「找資料、選平台、選工具」 | BS1–BS3 | — | —（可單看，不必照順序）|
+| 標注或富集卡住、想快速掃過可用資源 | BS4、BS5 | 配 [`references/`](references/) | — |
 
 **時間預估怎麼看**：估的是動手的時間，不含看影片，也假設你會停下來想每個參數的理由並寫下「數字、理由、紀錄」。只求「跑完不報錯」會快很多，但那不是這門課要教的。套件安裝與資料下載的等待另計。
 
@@ -84,6 +100,7 @@
 
 | 腳本 | 做什麼 | 集 |
 |---|---|---|
+| [`B00_setup.R`](R/B00_setup.R) | 裝套件（CRAN + Bioconductor + GitHub）、建專案資料夾、下載 PBMC 3k 與 ifnb | B1 |
 | [`B01_first_umap.R`](R/B01_first_umap.R) | 15 行從 `Read10X` 到 `DimPlot`——先給一次完整的成功經驗 | B1 |
 | [`B02_mkref_mkfastq.sh`](R/B02_mkref_mkfastq.sh) | 參考基因組自建與 FASTQ 產生（Cell Ranger 指令稿） | B2 |
 | [`B03_count.sh`](R/B03_count.sh) | `cellranger count` 與 `web_summary` 判讀 checklist | B3 |
@@ -104,9 +121,9 @@
 | [`B18_ecosystem.R`](R/B18_ecosystem.R) | 多模態、空間、Python 生態的接口示範 | B18 |
 | [`B19_strategy.R`](R/B19_strategy.R) | 兩個小型模擬：同一套流程套在不同資料結構上，哪一步先失效 | B19 |
 
-資料下載腳本在 [`data/download_data.R`](data/download_data.R)。**本倉庫不含任何資料檔與分析輸出**（見 `.gitignore`）。
+套件安裝與資料下載都在 [`B00_setup.R`](R/B00_setup.R)——22 個套件分屬 CRAN、Bioconductor 與 GitHub，這一支一次裝完。**本倉庫不含任何資料檔與分析輸出**（見 `.gitignore`）。
 
-建議做法：新建一個 RStudio Project，把 `R/` 與 `data/` 複製進去，先跑 `data/download_data.R`，再從 `B01_first_umap.R` 開始。全程不要用 `setwd()`。
+建議做法：新建一個 RStudio Project，把 `R/` 複製進去，先跑 `B00_setup.R`，再從 `B01_first_umap.R` 開始。全程不要用 `setwd()`。
 
 ## 資料
 
@@ -119,9 +136,11 @@
 | inferCNV 內建範例 | 含正常參考細胞的腫瘤資料 | B16 |
 | 兩個小型模擬 | 不同資料結構的策略對照 | B19 |
 
+PBMC 3k 與 ifnb 由 [`R/B00_setup.R`](R/B00_setup.R) 自動取得；B2–B3 的 FASTQ 只有要自己跑 Cell Ranger 才需要，下載位置見那兩支指令稿。
+
 ## 自測題庫
 
-114 題（每集 6 題），中英對照，含單選、多選與是非。互動題庫在 [`quiz/`](quiz/)：把整個資料夾下載到電腦後，點擊 `index.html` 即可開啟作答——即點即答、附解析、可切換中英文、可隨機抽題、進度自動保存。不需要架站也不需要連網。
+114 題（主線每集 6 題），中英對照，含單選、多選與是非。BS 補充篇不另出題。互動題庫在 [`quiz/`](quiz/)：把整個資料夾下載到電腦後，點擊 `index.html` 即可開啟作答——即點即答、附解析、可切換中英文、可隨機抽題、進度自動保存。不需要架站也不需要連網。
 
 ## 實作練習題（exercises/）
 
@@ -144,6 +163,8 @@
 | [富集分析](references/富集分析參考庫/) | 基因集資料庫、GSEA / ORA 工具鏈、單細胞活性推斷、網頁工具 | 16 / 13 | B12、B13 |
 | [單細胞與空間資料庫](references/單細胞與空間資料庫參考庫/) | 要找新資料時該去哪個儲存庫、圖譜站或空間資料庫 | 16 / 11 | B1、B18 |
 | [工具目錄與學習資源](references/工具目錄與學習資源參考庫/) | 做某種分析該用什麼工具、去哪裡繼續學、benchmark 證據在哪 | 12 / 7 | B18 |
+
+不想逐條讀的話，**BS4 與 BS5 是前兩座庫的導覽版**——用講的走完一次決策樹，再回來查會快很多。
 
 > [Q 系列 · 快速上手篇](https://github.com/Charlene717/scRNA-seq-tutorial-Qseries) 的 `references/` 是這四座庫的**精簡版**（精選全收、延伸只挑 Q 系列用得到的）。要完整版就是這裡。
 
@@ -204,9 +225,8 @@
 scRNA-seq-tutorial-Bseries/
 ├── README.md
 ├── LICENSE                  # 程式碼：MIT
-├── slides/                  # 投影片 PDF，中英各二十份
-├── R/                       # 十九支隨集腳本
-├── data/                    # 資料下載腳本（不放原始資料）
+├── slides/                  # 投影片 PDF，中英各二十五份（主線 19 + 補充 5 + 總結卡）
+├── R/                       # 環境建置腳本 + 十九支隨集腳本
 ├── exercises/               # 實作練習題 80 題
 │   ├── 基礎/                # 20 題：換一份資料把課程流程走完
 │   ├── 進階/                # 60 題：發表導向的完整再分析專案
@@ -217,7 +237,7 @@ scRNA-seq-tutorial-Bseries/
 
 ## 授權
 
-- **程式碼**（`R/`、`data/`、`quiz/`）：[MIT License](LICENSE)——可自由使用、修改、再散布。
+- **程式碼**（`R/`、`quiz/`）：[MIT License](LICENSE)——可自由使用、修改、再散布。
 - **教材**（`slides/` 的投影片、`exercises/` 的題卡與 `references/` 的參考庫，及其中的圖表文字）：[CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/deed.zh-hant)——註明出處、非商業使用；商業授權請聯絡作者。
 
 課堂使用（含大學課程、實驗室內部訓練）屬於非商業使用，歡迎直接拿去用，請保留出處。
