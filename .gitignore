@@ -1,0 +1,24 @@
+# ---- R 執行期產物（跑腳本會生成，不入庫）----
+data/pbmc*/
+data/*.tar.gz
+output/
+GDCdata/
+*.rds
+*.RData
+.Rhistory
+.Rproj.user/
+*.Rproj
+renv/library/
+renv/staging/
+
+# ---- Cell Ranger 執行期產物 ----
+*_out/
+outs/
+*.bam
+*.bam.bai
+*.fastq.gz
+
+# ---- 系統雜物 ----
+.DS_Store
+Thumbs.db
+~$*
